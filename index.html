@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Registro de Participantes · ExpoIndustrial 2026</title>
+<style>
+  :root {
+    --navy:       #07122A;
+    --navy-med:   #0E2044;
+    --navy-light: #182E58;
+    --navy-bd:    #1E3A6A;
+    --gold:       #C9A547;
+    --gold-lt:    #E2C06B;
+    --gold-pale:  #F0E5C0;
+    --gold-faint: rgba(201,165,71,.15);
+    --gold-line:  rgba(201,165,71,.30);
+    --white:      #F7F4EE;
+    --muted:      #7A95B2;
+    --error:      #E87070;
+    --success:    #3DC9A4;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+    background: var(--navy);
+    color: var(--white);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── HEADER ── */
+  .hdr {
+    background: var(--navy-med);
+    border-bottom: 2px solid var(--gold);
+    padding: 18px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .hdr-left { display: flex; align-items: center; gap: 14px; }
+  .hdr-icon {
+    width: 42px; height: 42px; border-radius: 50%;
+    border: 2px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .hdr-tag  { font-size: 11px; color: var(--gold); text-transform: uppercase; letter-spacing: .12em; font-weight: 700; }
+  .hdr-name { font-size: 16px; font-weight: 700; color: var(--white); margin-top: 2px; }
+  .hdr-right { text-align: right; font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .hdr-right em { font-style: italic; }
+
+  /* ── VIEWS ── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── CONTAINER ── */
+  .wrap { max-width: 680px; margin: 0 auto; padding: 40px 20px 60px; }
+  .wrap-wide { max-width: 1120px; margin: 0 auto; padding: 32px 20px 60px; }
+
+  /* ── INTRO ── */
+  .intro { text-align: center; margin-bottom: 32px; }
+  .intro-tag {
+    display: inline-block; font-size: 11px; color: var(--gold);
+    text-transform: uppercase; letter-spacing: .15em; font-weight: 700;
+    border: 1px solid var(--gold-line); border-radius: 20px;
+    padding: 4px 14px; margin-bottom: 14px;
+  }
+  .intro h1 { font-size: 28px; font-weight: 700; color: var(--white); line-height: 1.25; margin-bottom: 12px; }
+  .intro p  { font-size: 15px; color: var(--muted); line-height: 1.7; }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--navy-med);
+    border: 1px solid var(--navy-bd);
+    border-radius: 14px;
+    padding: 32px 28px;
+  }
+
+  /* ── SECTION LABEL ── */
+  .sec-label {
+    font-size: 11px; color: var(--gold); text-transform: uppercase;
+    letter-spacing: .1em; font-weight: 700;
+    border-left: 3px solid var(--gold); padding-left: 12px;
+    margin-bottom: 20px;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 24px 0;
+  }
+
+  /* ── GRID ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 540px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* ── FIELD ── */
+  .field { margin-bottom: 18px; }
+  label  { display: block; font-size: 11px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 7px; }
+  label .req { color: var(--error); margin-left: 2px; }
+  .err-msg { font-size: 12px; color: var(--error); margin-top: 5px; display: none; }
+  .err-msg.show { display: block; }
+
+  /* ── INPUTS ── */
+  input, select {
+    width: 100%; padding: 11px 14px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid var(--navy-bd);
+    border-radius: 8px;
+    color: var(--white);
+    font-family: inherit; font-size: 15px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    -webkit-appearance: none; appearance: none;
+  }
+  input::placeholder { color: var(--muted); opacity: .7; }
+  input:focus, select:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,165,71,.18);
+  }
+  input.invalid, select.invalid { border-color: var(--error); }
+  select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237A95B2' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+  select option { background: var(--navy-med); color: var(--white); }
+
+  /* ── BUTTON PRIMARY ── */
+  .btn-primary {
+    width: 100%; padding: 15px 24px;
+    background: linear-gradient(135deg, var(--gold-lt), var(--gold));
+    border: none; border-radius: 10px;
+    color: var(--navy);
+    font-family: inherit; font-size: 16px; font-weight: 700;
+    letter-spacing: .05em; cursor: pointer;
+    transition: opacity .2s, transform .1s;
+  }
+  .btn-primary:hover { opacity: .92; }
+  .btn-primary:active { transform: scale(.99); }
+  .btn-primary:disabled { opacity: .55; cursor: not-allowed; }
+
+  /* ── TRUST BADGES ── */
+  .badges { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 20px; }
+  .badge {
+    background: var(--navy-med); border: 1px solid var(--navy-bd);
+    border-radius: 10px; padding: 14px 10px; text-align: center;
+  }
+  .badge-icon { font-size: 20px; margin-bottom: 6px; }
+  .badge-title { font-size: 12px; font-weight: 700; color: var(--white); margin-bottom: 3px; }
+  .badge-sub   { font-size: 11px; color: var(--muted); }
+
+  /* ── LINK BTN ── */
+  .link-btn {
+    background: none; border: none; color: var(--muted);
+    font-family: inherit; font-size: 12px; cursor: pointer;
+    text-decoration: underline;
+  }
+
+  /* ── SUCCESS ── */
+  .success-icon {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: var(--gold-faint); border: 2px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+  }
+  .steps { margin-top: 8px; }
+  .step { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 14px; }
+  .step-time { min-width: 110px; font-size: 11px; color: var(--gold); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding-top: 2px; }
+  .step-text { font-size: 14px; color: var(--white); line-height: 1.55; }
+  .contact-card {
+    background: var(--navy-med); border: 1px solid var(--gold-line);
+    border-radius: 12px; padding: 20px 24px; text-align: center; margin-top: 28px;
+  }
+
+  /* ── ADMIN LOGIN ── */
+  .admin-login-wrap { max-width: 400px; margin: 70px auto; padding: 0 20px; }
+
+  /* ── ADMIN TABLE ── */
+  .admin-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 24px; }
+  .admin-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .stat-box { background: var(--gold-faint); border: 1px solid var(--gold-line); border-radius: 8px; padding: 8px 18px; text-align: center; }
+  .stat-label { font-size: 10px; color: var(--gold); text-transform: uppercase; letter-spacing: .08em; }
+  .stat-num   { font-size: 24px; font-weight: 700; color: var(--gold-lt); }
+  .btn-export {
+    background: linear-gradient(135deg, var(--gold-lt), var(--gold));
+    border: none; border-radius: 8px; padding: 10px 20px;
+    color: var(--navy); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .btn-outline {
+    background: none; border: 1px solid var(--navy-bd); border-radius: 8px;
+    padding: 10px 16px; color: var(--muted); font-family: inherit;
+    font-size: 14px; cursor: pointer;
+  }
+  .table-wrap { overflow-x: auto; background: var(--navy-med); border: 1px solid var(--navy-bd); border-radius: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { border-bottom: 2px solid var(--gold); }
+  th { padding: 12px 14px; text-align: left; color: var(--gold); font-weight: 700; text-transform: uppercase; letter-spacing: .07em; font-size: 10px; white-space: nowrap; }
+  td { padding: 11px 14px; border-bottom: 1px solid var(--navy-bd); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+  .pill { display: inline-block; background: var(--gold-faint); border: 1px solid var(--gold-line); border-radius: 6px; padding: 2px 8px; font-size: 11px; color: var(--gold-lt); white-space: nowrap; }
+  .td-muted { color: var(--muted); }
+  .td-trunc { max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .empty-state { padding: 60px; text-align: center; color: var(--muted); font-size: 15px; }
+  .country-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); gap: 12px; margin-top: 20px; }
+  .country-card { background: var(--navy-med); border: 1px solid var(--navy-bd); border-radius: 10px; padding: 14px 16px; }
+  .country-name { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
+  .country-num  { font-size: 22px; font-weight: 700; color: var(--gold-lt); }
+
+  .hint { text-align: center; font-size: 12px; color: var(--muted); margin-top: 12px; line-height: 1.55; }
+</style>
+</head>
+<body>
+
+<!-- ══════════ HEADER (shared) ══════════ -->
+<header class="hdr">
+  <div class="hdr-left">
+    <div class="hdr-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A547" stroke-width="1.8">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    </div>
+    <div>
+      <div class="hdr-tag">ExpoIndustrial 2026 · SENA Bogotá</div>
+      <div class="hdr-name">Ciberseguridad Industrial · De la Vulnerabilidad a la Resiliencia</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <em>Juan Carlos Alzate García</em><br>
+    Founder &amp; CEO · Transformación ExO
+  </div>
+</header>
+
+
+<!-- ══════════ VIEW: FORM ══════════ -->
+<div id="view-form" class="view active">
+  <div class="wrap">
+
+    <div class="intro">
+      <span class="intro-tag">Acceso a Recursos Exclusivos</span>
+      <h1>Registro de Participantes</h1>
+      <p>Completa este formulario para recibir todos los entregables de la conferencia: Evaluación de Madurez IEC&nbsp;62443, Canvas de Seguridad Industrial, hoja de ruta personalizada y plantillas descargables.</p>
+    </div>
+
+    <div class="card">
+
+      <!-- Personal -->
+      <p class="sec-label">Información Personal</p>
+      <div class="grid-2">
+        <div class="field">
+          <label for="nombres">Nombres <span class="req">*</span></label>
+          <input id="nombres" type="text" placeholder="Ej. Carlos Andrés" autocomplete="given-name"/>
+          <div class="err-msg" id="err-nombres">Este campo es requerido</div>
+        </div>
+        <div class="field">
+          <label for="apellidos">Apellidos <span class="req">*</span></label>
+          <input id="apellidos" type="text" placeholder="Ej. Gómez Restrepo" autocomplete="family-name"/>
+          <div class="err-msg" id="err-apellidos">Este campo es requerido</div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="email">Correo Electrónico <span class="req">*</span></label>
+          <input id="email" type="email" placeholder="nombre@empresa.com" autocomplete="email"/>
+          <div class="err-msg" id="err-email">Ingresa un correo válido</div>
+        </div>
+        <div class="field">
+          <label for="telefono">Teléfono / WhatsApp <span class="req">*</span></label>
+          <input id="telefono" type="tel" placeholder="+57 300 000 0000" autocomplete="tel"/>
+          <div class="err-msg" id="err-telefono">Este campo es requerido</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Empresa -->
+      <p class="sec-label">Información de la Empresa</p>
+      <div class="field">
+        <label for="empresa">Nombre de la Empresa <span class="req">*</span></label>
+        <input id="empresa" type="text" placeholder="Razón social o nombre comercial" autocomplete="organization"/>
+        <div class="err-msg" id="err-empresa">Este campo es requerido</div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="sector">Sector Industrial <span class="req">*</span></label>
+          <select id="sector">
+            <option value="">Selecciona…</option>
+            <option>Manufactura</option>
+            <option>Logística y Cadena de Suministro</option>
+            <option>Puertos y Transporte Marítimo</option>
+            <option>Agroindustria</option>
+            <option>Minería</option>
+            <option>Utilities y Energía</option>
+            <option>Petróleo y Gas</option>
+            <option>Servicios Industriales</option>
+            <option>Tecnología Industrial</option>
+            <option>Otro</option>
+          </select>
+          <div class="err-msg" id="err-sector">Selecciona un sector</div>
+        </div>
+        <div class="field">
+          <label for="empleados">Número de Empleados <span class="req">*</span></label>
+          <select id="empleados">
+            <option value="">Selecciona…</option>
+            <option>1 – 10</option>
+            <option>11 – 50</option>
+            <option>51 – 200</option>
+            <option>201 – 500</option>
+            <option>501 – 1.000</option>
+            <option>1.001 – 5.000</option>
+            <option>Más de 5.000</option>
+          </select>
+          <div class="err-msg" id="err-empleados">Selecciona un rango</div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="ciudad">Ciudad <span class="req">*</span></label>
+          <input id="ciudad" type="text" placeholder="Ej. Bogotá, Medellín…" autocomplete="address-level2"/>
+          <div class="err-msg" id="err-ciudad">Este campo es requerido</div>
+        </div>
+        <div class="field">
+          <label for="pais">País <span class="req">*</span></label>
+          <select id="pais">
+            <option value="">Selecciona…</option>
+            <option selected>Colombia</option>
+            <option>Ecuador</option>
+            <option>Perú</option>
+            <option>México</option>
+            <option>Chile</option>
+            <option>Argentina</option>
+            <option>Brasil</option>
+            <option>Venezuela</option>
+            <option>Panamá</option>
+            <option>Costa Rica</option>
+            <option>Guatemala</option>
+            <option>Paraguay</option>
+            <option>Uruguay</option>
+            <option>Bolivia</option>
+            <option>Otro</option>
+          </select>
+          <div class="err-msg" id="err-pais">Selecciona un país</div>
+        </div>
+      </div>
+
+      <div style="margin-top:28px">
+        <button class="btn-primary" id="btn-submit" onclick="handleSubmit()">
+          ✓&nbsp;&nbsp;Acceder a los Recursos Gratuitos
+        </button>
+        <p class="hint">Tu información es confidencial y solo se usará para enviarte los materiales de la conferencia.</p>
+      </div>
+    </div><!-- /card -->
+
+    <!-- Trust badges -->
+    <div class="badges">
+      <div class="badge"><div class="badge-icon">🔒</div><div class="badge-title">Datos Seguros</div><div class="badge-sub">Uso confidencial</div></div>
+      <div class="badge"><div class="badge-icon">📊</div><div class="badge-title">Evaluación Madurez</div><div class="badge-sub">IEC 62443 + NIST</div></div>
+      <div class="badge"><div class="badge-icon">📋</div><div class="badge-title">8 Entregables</div><div class="badge-sub">Valor +$8.000 USD</div></div>
+    </div>
+
+    <div style="text-align:center;margin-top:28px">
+      <button class="link-btn" onclick="showView('view-admin-login')">Panel de administración</button>
+    </div>
+
+  </div>
+</div><!-- /view-form -->
+
+
+<!-- ══════════ VIEW: SUCCESS ══════════ -->
+<div id="view-success" class="view">
+  <div class="wrap" style="max-width:560px;text-align:center">
+
+    <div class="success-icon">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#C9A547" stroke-width="2.2">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+
+    <h2 style="font-size:26px;font-weight:700;margin-bottom:12px">¡Registro Exitoso!</h2>
+    <p style="font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:6px">
+      <strong id="success-name" style="color:var(--gold-lt)"></strong>, bienvenido/a a la comunidad de líderes en ciberseguridad industrial de LATAM.
+    </p>
+    <p style="font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:32px">
+      Recibirás tus entregables en <strong id="success-email" style="color:var(--white)"></strong> en las próximas horas.
+    </p>
+
+    <div class="divider"></div>
+
+    <p style="font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin:24px 0 16px">Próximos Pasos</p>
+    <div class="steps">
+      <div class="step"><span class="step-time">Hoy</span><span class="step-text">Lleva tus entregables impresos del evento</span></div>
+      <div class="step"><span class="step-time">Esta semana</span><span class="step-text">Completa la Evaluación de Madurez online (20 minutos)</span></div>
+      <div class="step"><span class="step-time">2 semanas</span><span class="step-text">Juan Carlos te contacta con resultados personalizados y propuesta sin obligación</span></div>
+      <div class="step"><span class="step-time">Mes 1</span><span class="step-text">Agenda tu consulta diagnóstica gratuita de 15 minutos</span></div>
+    </div>
+
+    <div class="contact-card">
+      <p style="font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:10px">Contacto Directo</p>
+      <p style="font-size:15px;font-weight:700;margin-bottom:4px">Juan Carlos Alzate García</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:2px">juan.carlos@transformacionexo.com</p>
+      <p style="font-size:13px;color:var(--muted)">www.transformacionexo.com</p>
+    </div>
+
+    <button onclick="resetForm()" style="margin-top:24px;background:none;border:1px solid var(--navy-bd);border-radius:8px;padding:10px 24px;color:var(--muted);font-family:inherit;font-size:14px;cursor:pointer">
+      ← Registrar otro participante
+    </button>
+
+  </div>
+</div><!-- /view-success -->
+
+
+<!-- ══════════ VIEW: ADMIN LOGIN ══════════ -->
+<div id="view-admin-login" class="view">
+  <div class="admin-login-wrap">
+    <div class="card" style="text-align:center">
+      <div style="width:56px;height:56px;border-radius:50%;background:var(--gold-faint);border:1px solid var(--gold-line);display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C9A547" stroke-width="1.8">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0110 0v4"/>
+        </svg>
+      </div>
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Panel Administrativo</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:26px">Acceso restringido a organizadores del evento</p>
+
+      <div class="field" style="text-align:left">
+        <label for="admin-pwd">Contraseña de acceso</label>
+        <input id="admin-pwd" type="password" placeholder="Ingresa la contraseña" onkeydown="if(event.key==='Enter')adminLogin()"/>
+        <div class="err-msg" id="err-admin-pwd">Contraseña incorrecta. Intenta de nuevo.</div>
+      </div>
+
+      <button class="btn-primary" onclick="adminLogin()">Ingresar al Panel</button>
+      <br>
+      <button class="link-btn" style="margin-top:14px" onclick="showView('view-form')">← Volver al formulario</button>
+    </div>
+  </div>
+</div><!-- /view-admin-login -->
+
+
+<!-- ══════════ VIEW: ADMIN ══════════ -->
+<div id="view-admin" class="view">
+  <div class="wrap-wide">
+
+    <div class="admin-top">
+      <div>
+        <h2 style="font-size:22px;font-weight:700;margin-bottom:4px">Registros de Participantes</h2>
+        <p style="font-size:14px;color:var(--muted)">ExpoIndustrial 2026 · SENA Bogotá</p>
+      </div>
+      <div class="admin-actions">
+        <div class="stat-box">
+          <div class="stat-label">Total</div>
+          <div class="stat-num" id="admin-total">0</div>
+        </div>
+        <button class="btn-export" onclick="exportCSV()">↓&nbsp; Exportar CSV</button>
+        <button class="btn-outline" onclick="showView('view-form')">← Salir</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Fecha</th><th>Nombres</th><th>Apellidos</th>
+            <th>Empresa</th><th>Sector</th><th>Empleados</th>
+            <th>Email</th><th>Teléfono</th><th>Ciudad</th><th>País</th>
+          </tr>
+        </thead>
+        <tbody id="admin-tbody">
+          <tr><td colspan="11" class="empty-state">No hay registros aún.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="country-grid" id="country-grid"></div>
+
+  </div>
+</div><!-- /view-admin -->
+
+
+<script>
+  const ADMIN_PASSWORD = 'ExoSec2026@SENA';
+  const STORAGE_KEY    = 'registros_conferencia_exo_v1';
+
+  /* ── Helpers ── */
+  function showView(id) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function getRecords() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+    catch { return []; }
+  }
+  function saveRecords(arr) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  }
+
+  function fmtDate() {
+    return new Date().toLocaleString('es-CO', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  }
+
+  /* ── Form validation & submit ── */
+  function getVal(id) { return document.getElementById(id).value.trim(); }
+  function showErr(id) { document.getElementById('err-' + id).classList.add('show'); document.getElementById(id).classList.add('invalid'); }
+  function clearErr(id) { document.getElementById('err-' + id).classList.remove('show'); document.getElementById(id).classList.remove('invalid'); }
+
+  // Live clear on input
+  ['nombres','apellidos','email','telefono','empresa','sector','empleados','ciudad','pais'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => clearErr(id));
+  });
+
+  function handleSubmit() {
+    const fields = ['nombres','apellidos','email','telefono','empresa','sector','empleados','ciudad','pais'];
+    let ok = true;
+    fields.forEach(id => clearErr(id));
+
+    if (!getVal('nombres'))   { showErr('nombres');   ok = false; }
+    if (!getVal('apellidos')) { showErr('apellidos'); ok = false; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(getVal('email'))) { showErr('email'); ok = false; }
+    if (!getVal('telefono'))  { showErr('telefono');  ok = false; }
+    if (!getVal('empresa'))   { showErr('empresa');   ok = false; }
+    if (!getVal('sector'))    { showErr('sector');    ok = false; }
+    if (!getVal('empleados')) { showErr('empleados'); ok = false; }
+    if (!getVal('ciudad'))    { showErr('ciudad');    ok = false; }
+    if (!getVal('pais'))      { showErr('pais');      ok = false; }
+
+    if (!ok) return;
+
+    const btn = document.getElementById('btn-submit');
+    btn.disabled = true;
+    btn.textContent = 'Registrando…';
+
+    const record = {
+      id:        Date.now(),
+      fecha:     fmtDate(),
+      nombres:   getVal('nombres'),
+      apellidos: getVal('apellidos'),
+      email:     getVal('email'),
+      telefono:  getVal('telefono'),
+      empresa:   getVal('empresa'),
+      sector:    getVal('sector'),
+      empleados: getVal('empleados'),
+      ciudad:    getVal('ciudad'),
+      pais:      getVal('pais'),
+    };
+
+    const records = getRecords();
+    records.push(record);
+    saveRecords(records);
+
+    document.getElementById('success-name').textContent  = record.nombres + ' ' + record.apellidos;
+    document.getElementById('success-email').textContent = record.email;
+
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = '✓  Acceder a los Recursos Gratuitos';
+      showView('view-success');
+    }, 600);
+  }
+
+  function resetForm() {
+    ['nombres','apellidos','email','telefono','empresa','ciudad'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('sector').value   = '';
+    document.getElementById('empleados').value = '';
+    document.getElementById('pais').value     = 'Colombia';
+    ['nombres','apellidos','email','telefono','empresa','sector','empleados','ciudad','pais'].forEach(id => clearErr(id));
+    showView('view-form');
+  }
+
+  /* ── Admin ── */
+  function adminLogin() {
+    const pwd = document.getElementById('admin-pwd').value;
+    if (pwd !== ADMIN_PASSWORD) {
+      document.getElementById('err-admin-pwd').classList.add('show');
+      document.getElementById('admin-pwd').classList.add('invalid');
+      return;
+    }
+    document.getElementById('err-admin-pwd').classList.remove('show');
+    document.getElementById('admin-pwd').classList.remove('invalid');
+    renderAdmin();
+    showView('view-admin');
+  }
+
+  function renderAdmin() {
+    const records = getRecords();
+    document.getElementById('admin-total').textContent = records.length;
+
+    const tbody = document.getElementById('admin-tbody');
+    if (records.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Aún no hay registros. Comparte el formulario con los participantes.</td></tr>';
+    } else {
+      tbody.innerHTML = records.map((r, i) => `
+        <tr>
+          <td class="td-muted">${i + 1}</td>
+          <td class="td-muted" style="white-space:nowrap">${r.fecha}</td>
+          <td>${esc(r.nombres)}</td>
+          <td>${esc(r.apellidos)}</td>
+          <td class="td-trunc" title="${esc(r.empresa)}">${esc(r.empresa)}</td>
+          <td><span class="pill">${esc(r.sector)}</span></td>
+          <td class="td-muted" style="white-space:nowrap">${esc(r.empleados)}</td>
+          <td class="td-muted">${esc(r.email)}</td>
+          <td class="td-muted" style="white-space:nowrap">${esc(r.telefono)}</td>
+          <td>${esc(r.ciudad)}</td>
+          <td>${esc(r.pais)}</td>
+        </tr>`).join('');
+    }
+
+    // Country summary
+    const counts = {};
+    records.forEach(r => { counts[r.pais] = (counts[r.pais] || 0) + 1; });
+    const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,6);
+    const grid = document.getElementById('country-grid');
+    grid.innerHTML = sorted.length ? sorted.map(([pais, cnt]) => `
+      <div class="country-card">
+        <div class="country-name">${esc(pais)}</div>
+        <div class="country-num">${cnt}</div>
+      </div>`).join('') : '';
+  }
+
+  function esc(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ── CSV Export ── */
+  function exportCSV() {
+    const records = getRecords();
+    const cols = ['Fecha','Nombres','Apellidos','Empresa','Sector','No. Empleados','Email','Teléfono','Ciudad','País'];
+    const rows = records.map(r => [r.fecha,r.nombres,r.apellidos,r.empresa,r.sector,r.empleados,r.email,r.telefono,r.ciudad,r.pais]);
+    const csv  = [cols,...rows].map(row => row.map(v => '"' + String(v||'').replace(/"/g,'""') + '"').join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type:'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'registros_exoindustrial_' + new Date().toISOString().slice(0,10) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+</script>
+</body>
+</html>
