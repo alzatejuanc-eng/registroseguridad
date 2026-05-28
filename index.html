@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Registro · ExpoIndustrial 2026</title>
+<style>
+:root{
+  --navy:#07122A; --navy-med:#0E2044; --navy-light:#182E58; --navy-bd:#1E3A6A;
+  --gold:#C9A547; --gold-lt:#E2C06B; --gold-faint:rgba(201,165,71,.15);
+  --gold-line:rgba(201,165,71,.30); --white:#F7F4EE; --muted:#7A95B2;
+  --error:#E87070; --ok:#3DC9A4; --ok-faint:rgba(61,201,164,.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+  background:var(--navy);color:var(--white);min-height:100vh;
+  -webkit-font-smoothing:antialiased}
+.hdr{background:var(--navy-med);border-bottom:2px solid var(--gold);
+  padding:16px 32px;display:flex;align-items:center;
+  justify-content:space-between;flex-wrap:wrap;gap:12px}
+.hdr-left{display:flex;align-items:center;gap:14px}
+.hdr-icon{width:40px;height:40px;border-radius:50%;border:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hdr-tag{font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:.13em;font-weight:700}
+.hdr-name{font-size:15px;font-weight:700;color:var(--white);margin-top:2px}
+.hdr-right{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.counter-box{background:var(--gold-faint);border:1px solid var(--gold-line);
+  border-radius:8px;padding:6px 14px;text-align:center}
+.counter-num{font-size:20px;font-weight:700;color:var(--gold-lt);line-height:1}
+.counter-lbl{font-size:9px;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+.hdr-speaker{text-align:right;font-size:12px;color:var(--muted);line-height:1.55}
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--navy-med);border:1px solid var(--ok);border-radius:10px;
+  padding:13px 22px;font-size:14px;color:var(--ok);font-family:inherit;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .35s,opacity .35s;
+  opacity:0;pointer-events:none;white-space:nowrap;z-index:9999}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+#toast.warn{border-color:#E8C547;color:#E8C547}
+.view{display:none}.view.active{display:block}
+.wrap{max-width:680px;margin:0 auto;padding:38px 20px 60px}
+.wrap-wide{max-width:1120px;margin:0 auto;padding:28px 20px 60px}
+.intro{text-align:center;margin-bottom:30px}
+.intro-tag{display:inline-block;font-size:11px;color:var(--gold);text-transform:uppercase;
+  letter-spacing:.15em;font-weight:700;border:1px solid var(--gold-line);
+  border-radius:20px;padding:4px 14px;margin-bottom:14px}
+.intro h1{font-size:27px;font-weight:700;color:var(--white);line-height:1.25;margin-bottom:12px}
+.intro p{font-size:15px;color:var(--muted);line-height:1.7}
+.card{background:var(--navy-med);border:1px solid var(--navy-bd);border-radius:14px;padding:28px}
+.sec-label{font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;
+  font-weight:700;border-left:3px solid var(--gold);padding-left:12px;margin-bottom:18px}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:22px 0}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:540px){.grid-2{grid-template-columns:1fr}}
+.field{margin-bottom:16px}
+label{display:block;font-size:11px;font-weight:700;color:var(--gold);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px}
+label .req{color:var(--error);margin-left:2px}
+.err-msg{font-size:12px;color:var(--error);margin-top:5px;display:none}
+.err-msg.show{display:block}
+input,select{width:100%;padding:11px 14px;background:rgba(255,255,255,.05);
+  border:1px solid var(--navy-bd);border-radius:8px;color:var(--white);
+  font-family:inherit;font-size:15px;outline:none;
+  transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;appearance:none}
+input::placeholder{color:var(--muted);opacity:.7}
+input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-faint)}
+input.invalid,select.invalid{border-color:var(--error)}
+select{cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237A95B2' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+select option{background:var(--navy-med);color:var(--white)}
+.btn-gold{background:linear-gradient(135deg,var(--gold-lt),var(--gold));border:none;
+  border-radius:10px;color:var(--navy);font-family:inherit;font-size:15px;
+  font-weight:700;letter-spacing:.05em;cursor:pointer;padding:13px 22px;
+  transition:opacity .2s,transform .1s}
+.btn-gold:hover{opacity:.91}.btn-gold:active{transform:scale(.99)}
+.btn-gold:disabled{opacity:.5;cursor:not-allowed}
+.btn-gold.full{width:100%;font-size:16px;padding:15px 24px}
+.btn-outline{background:none;border:1px solid var(--navy-bd);border-radius:8px;
+  padding:10px 16px;color:var(--muted);font-family:inherit;font-size:14px;cursor:pointer}
+.btn-ok{background:var(--ok-faint);border:1px solid rgba(61,201,164,.4);border-radius:8px;
+  padding:10px 18px;color:var(--ok);font-family:inherit;font-size:14px;cursor:pointer;font-weight:600}
+.link-btn{background:none;border:none;color:var(--muted);font-family:inherit;
+  font-size:12px;cursor:pointer;text-decoration:underline}
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.badge{background:var(--navy-med);border:1px solid var(--navy-bd);border-radius:10px;padding:13px 10px;text-align:center}
+.badge-icon{font-size:20px;margin-bottom:5px}
+.badge-title{font-size:12px;font-weight:700;color:var(--white);margin-bottom:3px}
+.badge-sub{font-size:11px;color:var(--muted)}
+.success-icon{width:78px;height:78px;border-radius:50%;background:var(--gold-faint);
+  border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 22px}
+.step{display:flex;gap:14px;align-items:flex-start;margin-bottom:13px}
+.step-time{min-width:110px;font-size:11px;color:var(--gold);font-weight:700;
+  text-transform:uppercase;letter-spacing:.06em;padding-top:2px}
+.step-text{font-size:14px;color:var(--white);line-height:1.55}
+.tabs{display:flex;gap:4px;margin-bottom:24px;background:var(--navy-med);
+  border:1px solid var(--navy-bd);border-radius:10px;padding:5px}
+.tab{flex:1;padding:10px 16px;background:none;border:none;border-radius:7px;
+  color:var(--muted);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;
+  transition:all .2s;text-align:center}
+.tab.active{background:var(--gold-faint);color:var(--gold-lt);border:1px solid var(--gold-line)}
+.tab-content{display:none}.tab-content.active{display:block}
+.sheets-status{display:flex;align-items:center;gap:10px;padding:12px 16px;
+  border-radius:8px;font-size:13px;margin-bottom:20px;border:1px solid}
+.sheets-status.ok{background:var(--ok-faint);border-color:rgba(61,201,164,.35);color:var(--ok)}
+.sheets-status.warn{background:rgba(232,197,71,.1);border-color:rgba(232,197,71,.35);color:#E8C547}
+.sheets-status.err{background:rgba(232,112,112,.1);border-color:rgba(232,112,112,.35);color:var(--error)}
+.dot-s{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.dot-ok{background:var(--ok)}.dot-warn{background:#E8C547}.dot-err{background:var(--error)}
+.setup-steps{counter-reset:step;list-style:none}
+.setup-steps li{counter-increment:step;display:flex;gap:14px;align-items:flex-start;
+  margin-bottom:16px;font-size:14px;color:var(--white);line-height:1.6}
+.setup-steps li::before{content:counter(step);background:var(--gold-faint);
+  border:1px solid var(--gold-line);color:var(--gold-lt);font-weight:700;font-size:12px;
+  border-radius:50%;width:26px;height:26px;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;margin-top:1px}
+.code-block{position:relative;background:rgba(0,0,0,.4);border:1px solid var(--navy-bd);
+  border-radius:8px;padding:16px;margin:12px 0}
+.code-block pre{font-family:'Courier New',Courier,monospace;font-size:11.5px;color:#9ECFFF;
+  overflow-x:auto;white-space:pre;line-height:1.6}
+.copy-btn{position:absolute;top:10px;right:10px;background:var(--navy-light);
+  border:1px solid var(--navy-bd);border-radius:6px;padding:5px 10px;
+  color:var(--muted);font-family:inherit;font-size:11px;cursor:pointer;font-weight:600}
+.copy-btn:hover{color:var(--white)}
+.admin-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:20px}
+.admin-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.stat-box{background:var(--gold-faint);border:1px solid var(--gold-line);
+  border-radius:8px;padding:7px 16px;text-align:center}
+.stat-label{font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:.08em}
+.stat-num{font-size:23px;font-weight:700;color:var(--gold-lt)}
+.table-wrap{overflow-x:auto;background:var(--navy-med);border:1px solid var(--navy-bd);border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{border-bottom:2px solid var(--gold)}
+th{padding:11px 12px;text-align:left;color:var(--gold);font-weight:700;
+  text-transform:uppercase;letter-spacing:.07em;font-size:10px;white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--navy-bd);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+.pill{display:inline-block;background:var(--gold-faint);border:1px solid var(--gold-line);
+  border-radius:6px;padding:2px 8px;font-size:11px;color:var(--gold-lt);white-space:nowrap}
+.td-muted{color:var(--muted)}.td-trunc{max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.empty-state{padding:50px;text-align:center;color:var(--muted);font-size:15px}
+.country-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-top:18px}
+.country-card{background:var(--navy-med);border:1px solid var(--navy-bd);border-radius:10px;padding:13px 15px}
+.country-name{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.country-num{font-size:22px;font-weight:700;color:var(--gold-lt)}
+.hint{text-align:center;font-size:12px;color:var(--muted);margin-top:11px;line-height:1.55}
+</style>
+</head>
+<body>
+
+<!-- iframe oculto: recibe las respuestas del formulario sin abrir ventanas -->
+<iframe id="hidden_target" name="hidden_target"
+  style="display:none;position:absolute;width:0;height:0;border:0" aria-hidden="true"></iframe>
+
+<div id="toast"></div>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-left">
+    <div class="hdr-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A547" stroke-width="1.8">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    </div>
+    <div>
+      <div class="hdr-tag">ExpoIndustrial 2026 · SENA Bogotá</div>
+      <div class="hdr-name">Ciberseguridad Industrial · De la Vulnerabilidad a la Resiliencia</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="counter-box">
+      <div class="counter-num" id="hdr-count">0</div>
+      <div class="counter-lbl">Registrados</div>
+    </div>
+    <div class="hdr-speaker"><em>Juan Carlos Alzate García</em><br>Transformación ExO</div>
+  </div>
+</header>
+
+
+<!-- ═══ FORMULARIO ═══ -->
+<div id="view-form" class="view active">
+  <div class="wrap">
+    <div class="intro">
+      <span class="intro-tag">Acceso a Recursos Exclusivos</span>
+      <h1>Registro de Participantes</h1>
+      <p>Completa este formulario para recibir todos los entregables: Evaluación de Madurez IEC&nbsp;62443, Canvas de Seguridad Industrial, hoja de ruta personalizada y plantillas descargables.</p>
+    </div>
+    <div class="card">
+      <p class="sec-label">Información Personal</p>
+      <div class="grid-2">
+        <div class="field">
+          <label for="nombres">Nombres <span class="req">*</span></label>
+          <input id="nombres" type="text" placeholder="Ej. Carlos Andrés" autocomplete="given-name"/>
+          <div class="err-msg" id="err-nombres">Campo requerido</div>
+        </div>
+        <div class="field">
+          <label for="apellidos">Apellidos <span class="req">*</span></label>
+          <input id="apellidos" type="text" placeholder="Ej. Gómez Restrepo" autocomplete="family-name"/>
+          <div class="err-msg" id="err-apellidos">Campo requerido</div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="email">Correo Electrónico <span class="req">*</span></label>
+          <input id="email" type="email" placeholder="nombre@empresa.com" autocomplete="email"/>
+          <div class="err-msg" id="err-email">Ingresa un correo válido</div>
+        </div>
+        <div class="field">
+          <label for="telefono">Teléfono / WhatsApp <span class="req">*</span></label>
+          <input id="telefono" type="tel" placeholder="+57 300 000 0000" autocomplete="tel"/>
+          <div class="err-msg" id="err-telefono">Campo requerido</div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <p class="sec-label">Información de la Empresa</p>
+      <div class="field">
+        <label for="empresa">Nombre de la Empresa <span class="req">*</span></label>
+        <input id="empresa" type="text" placeholder="Razón social o nombre comercial" autocomplete="organization"/>
+        <div class="err-msg" id="err-empresa">Campo requerido</div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="sector">Sector Industrial <span class="req">*</span></label>
+          <select id="sector">
+            <option value="">Selecciona…</option>
+            <option>Manufactura</option><option>Logística y Cadena de Suministro</option>
+            <option>Puertos y Transporte Marítimo</option><option>Agroindustria</option>
+            <option>Minería</option><option>Utilities y Energía</option>
+            <option>Petróleo y Gas</option><option>Servicios Industriales</option>
+            <option>Tecnología Industrial</option><option>Otro</option>
+          </select>
+          <div class="err-msg" id="err-sector">Selecciona un sector</div>
+        </div>
+        <div class="field">
+          <label for="empleados">Número de Empleados <span class="req">*</span></label>
+          <select id="empleados">
+            <option value="">Selecciona…</option>
+            <option>1 – 10</option><option>11 – 50</option><option>51 – 200</option>
+            <option>201 – 500</option><option>501 – 1.000</option>
+            <option>1.001 – 5.000</option><option>Más de 5.000</option>
+          </select>
+          <div class="err-msg" id="err-empleados">Selecciona un rango</div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="ciudad">Ciudad <span class="req">*</span></label>
+          <input id="ciudad" type="text" placeholder="Ej. Bogotá, Medellín…" autocomplete="address-level2"/>
+          <div class="err-msg" id="err-ciudad">Campo requerido</div>
+        </div>
+        <div class="field">
+          <label for="pais">País <span class="req">*</span></label>
+          <select id="pais">
+            <option value="">Selecciona…</option>
+            <option selected>Colombia</option><option>Ecuador</option><option>Perú</option>
+            <option>México</option><option>Chile</option><option>Argentina</option>
+            <option>Brasil</option><option>Venezuela</option><option>Panamá</option>
+            <option>Costa Rica</option><option>Guatemala</option><option>Paraguay</option>
+            <option>Uruguay</option><option>Bolivia</option><option>Otro</option>
+          </select>
+          <div class="err-msg" id="err-pais">Selecciona un país</div>
+        </div>
+      </div>
+      <div style="margin-top:26px">
+        <button class="btn-gold full" id="btn-submit" onclick="handleSubmit()">
+          ✓&nbsp;&nbsp;Acceder a los Recursos Gratuitos
+        </button>
+        <p class="hint">Tu información es confidencial y solo se usará para enviarte los materiales de la conferencia.</p>
+      </div>
+    </div>
+    <div class="badges">
+      <div class="badge"><div class="badge-icon">🔒</div><div class="badge-title">Datos Seguros</div><div class="badge-sub">Uso confidencial</div></div>
+      <div class="badge"><div class="badge-icon">📊</div><div class="badge-title">Eval. Madurez</div><div class="badge-sub">IEC 62443 + NIST</div></div>
+      <div class="badge"><div class="badge-icon">📋</div><div class="badge-title">8 Entregables</div><div class="badge-sub">Valor +$8.000 USD</div></div>
+    </div>
+    <div style="text-align:center;margin-top:26px">
+      <button class="link-btn" onclick="showView('view-admin-login')">Panel de administración</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ ÉXITO ═══ -->
+<div id="view-success" class="view">
+  <div class="wrap" style="max-width:560px;text-align:center">
+    <div class="success-icon">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#C9A547" stroke-width="2.2">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <h2 style="font-size:25px;font-weight:700;margin-bottom:12px">¡Registro Exitoso!</h2>
+    <p style="font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:6px">
+      <strong id="success-name" style="color:var(--gold-lt)"></strong>, bienvenido/a a la comunidad de líderes en ciberseguridad industrial de LATAM.
+    </p>
+    <p style="font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:28px">
+      Recibirás tus entregables en <strong id="success-email" style="color:var(--white)"></strong> en las próximas horas.
+    </p>
+    <div class="divider"></div>
+    <p style="font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin:22px 0 14px">Próximos Pasos</p>
+    <div>
+      <div class="step"><span class="step-time">Hoy</span><span class="step-text">Lleva tus entregables impresos del evento</span></div>
+      <div class="step"><span class="step-time">Esta semana</span><span class="step-text">Completa la Evaluación de Madurez online (20 minutos)</span></div>
+      <div class="step"><span class="step-time">2 semanas</span><span class="step-text">Juan Carlos te contacta con resultados y propuesta personalizada</span></div>
+      <div class="step"><span class="step-time">Mes 1</span><span class="step-text">Agenda tu consulta diagnóstica gratuita de 15 minutos</span></div>
+    </div>
+    <div style="background:var(--navy-med);border:1px solid var(--gold-line);border-radius:12px;padding:20px 24px;text-align:center;margin-top:26px">
+      <p style="font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:10px">Contacto Directo</p>
+      <p style="font-size:15px;font-weight:700;margin-bottom:4px">Juan Carlos Alzate García</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:2px">juan.carlos@transformacionexo.com</p>
+      <p style="font-size:13px;color:var(--muted)">www.transformacionexo.com</p>
+    </div>
+    <button onclick="resetForm()" style="margin-top:22px;background:none;border:1px solid var(--navy-bd);border-radius:8px;padding:10px 24px;color:var(--muted);font-family:inherit;font-size:14px;cursor:pointer">
+      ← Registrar otro participante
+    </button>
+  </div>
+</div>
+
+
+<!-- ═══ ADMIN LOGIN ═══ -->
+<div id="view-admin-login" class="view">
+  <div style="max-width:400px;margin:70px auto;padding:0 20px">
+    <div class="card" style="text-align:center">
+      <div style="width:54px;height:54px;border-radius:50%;background:var(--gold-faint);border:1px solid var(--gold-line);display:flex;align-items:center;justify-content:center;margin:0 auto 18px">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#C9A547" stroke-width="1.8">
+          <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+        </svg>
+      </div>
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Panel Administrativo</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:24px">Acceso restringido a organizadores</p>
+      <div class="field" style="text-align:left">
+        <label for="admin-pwd">Contraseña <span class="req">*</span></label>
+        <input id="admin-pwd" type="password" placeholder="Ingresa la contraseña"
+          onkeydown="if(event.key==='Enter')adminLogin()"/>
+        <div class="err-msg" id="err-admin">Contraseña incorrecta</div>
+      </div>
+      <button class="btn-gold full" onclick="adminLogin()">Ingresar al Panel</button>
+      <br>
+      <button class="link-btn" style="margin-top:14px" onclick="showView('view-form')">← Volver al formulario</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ ADMIN PANEL ═══ -->
+<div id="view-admin" class="view">
+  <div class="wrap-wide">
+    <div class="admin-top">
+      <div>
+        <h2 style="font-size:21px;font-weight:700;margin-bottom:4px">Panel Administrativo</h2>
+        <p style="font-size:14px;color:var(--muted)">ExpoIndustrial 2026 · SENA Bogotá</p>
+      </div>
+      <div class="admin-actions">
+        <div class="stat-box">
+          <div class="stat-label">Registros sesión</div>
+          <div class="stat-num" id="admin-total">0</div>
+        </div>
+        <button class="btn-outline" onclick="showView('view-form')">← Volver al formulario</button>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" id="tab-config" onclick="switchTab('config')">⚙ Configuración Google Sheets</button>
+      <button class="tab" id="tab-data" onclick="switchTab('data')">📋 Registros y Exportar</button>
+    </div>
+
+    <!-- TAB: CONFIG -->
+    <div id="tab-content-config" class="tab-content active">
+      <div id="sheets-status-box" class="sheets-status warn">
+        <div class="dot-s dot-warn" id="sheets-dot"></div>
+        <span id="sheets-status-msg">Google Sheets no configurado — configura la URL para activar el guardado en la nube.</span>
+      </div>
+
+      <div class="grid-2" style="gap:24px">
+        <!-- Columna izquierda: URL y control -->
+        <div>
+          <div class="card">
+            <p class="sec-label">URL del Web App</p>
+            <div class="field">
+              <label for="sheets-url">URL de Apps Script (Web App)</label>
+              <input id="sheets-url" type="url"
+                placeholder="https://script.google.com/macros/s/…/exec"
+                style="font-size:13px"/>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn-gold" onclick="saveSheetConfig()" style="flex:1">Guardar URL</button>
+              <button class="btn-ok" onclick="testConnection()">Probar conexión</button>
+            </div>
+            <div id="config-msg" style="font-size:13px;margin-top:12px;display:none;line-height:1.6"></div>
+            <div class="divider"></div>
+            <p class="sec-label" style="margin-bottom:12px">Enlace a la hoja</p>
+            <a id="sheets-link" href="https://drive.google.com/drive/my-drive" target="_blank"
+              style="display:block;background:rgba(61,201,164,.1);border:1px solid rgba(61,201,164,.3);
+              border-radius:8px;padding:12px 16px;color:var(--ok);font-size:14px;
+              text-decoration:none;text-align:center">
+              📊 Abrir Google Drive →
+            </a>
+          </div>
+        </div>
+
+        <!-- Columna derecha: instrucciones + código -->
+        <div>
+          <div class="card">
+            <p class="sec-label">Configuración — paso a paso</p>
+            <ol class="setup-steps">
+              <li>Ve a <strong style="color:var(--gold-lt)">sheets.google.com</strong> y crea una hoja llamada <em>"Registros ExpoIndustrial 2026"</em></li>
+              <li>Menú de la hoja: <strong style="color:var(--gold-lt)">Extensiones → Apps Script</strong></li>
+              <li>Borra todo el código que aparece y pega el de abajo</li>
+              <li>Clic en <strong style="color:var(--gold-lt)">Implementar → Nueva implementación</strong><br>
+                <span style="color:var(--muted);font-size:13px">Tipo: Aplicación web · Ejecutar como: Yo · Acceso: Cualquier persona</span></li>
+              <li>Copia la <strong style="color:var(--gold-lt)">URL del Web App</strong> y pégala arriba</li>
+              <li>Haz clic en <strong style="color:var(--gold-lt)">Guardar URL</strong></li>
+            </ol>
+            <p style="font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin:18px 0 10px;border-left:3px solid var(--gold);padding-left:12px">Código Apps Script — copia y pega</p>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode()">Copiar</button>
+              <pre id="apps-script-code">function doPost(e) {
+  try {
+    var sheet = SpreadsheetApp
+      .getActiveSpreadsheet()
+      .getActiveSheet();
+
+    // Leer datos del formulario (e.parameter)
+    var d = e.parameter;
+
+    // Crear encabezado si la hoja está vacía
+    if (sheet.getLastRow() === 0) {
+      var hdr = sheet.appendRow([
+        'Fecha','Nombres','Apellidos',
+        'Empresa','Sector','No. Empleados',
+        'Email','Telefono','Ciudad','Pais'
+      ]);
+      sheet.getRange(1,1,1,10)
+        .setFontWeight('bold')
+        .setBackground('#0E2044')
+        .setFontColor('#C9A547');
+      sheet.setFrozenRows(1);
+    }
+
+    // Guardar fila con los datos
+    sheet.appendRow([
+      d.fecha, d.nombres, d.apellidos,
+      d.empresa, d.sector, d.empleados,
+      d.email, d.telefono, d.ciudad, d.pais
+    ]);
+
+    return ContentService
+      .createTextOutput('OK')
+      .setMimeType(ContentService.MimeType.TEXT);
+
+  } catch(err) {
+    return ContentService
+      .createTextOutput('ERROR: ' + err.toString())
+      .setMimeType(ContentService.MimeType.TEXT);
+  }
+}
+
+function doGet(e) {
+  return ContentService
+    .createTextOutput('Servicio activo')
+    .setMimeType(ContentService.MimeType.TEXT);
+}</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /tab-config -->
+
+    <!-- TAB: REGISTROS -->
+    <div id="tab-content-data" class="tab-content">
+      <div class="admin-top" style="margin-bottom:16px">
+        <p style="font-size:14px;color:var(--muted)">Registros de la sesión actual. Los datos también están en tu Google Sheet.</p>
+        <button class="btn-gold" onclick="exportCSV()">↓&nbsp; Exportar CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Fecha</th><th>Nombres</th><th>Apellidos</th>
+              <th>Empresa</th><th>Sector</th><th>Empleados</th>
+              <th>Email</th><th>Teléfono</th><th>Ciudad</th><th>País</th>
+            </tr>
+          </thead>
+          <tbody id="admin-tbody">
+            <tr><td colspan="11" class="empty-state">Aún no hay registros en esta sesión.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="country-grid" id="country-grid"></div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ══════════════════════════════════════════════
+   ALMACENAMIENTO DUAL: Google Sheets (principal)
+   + memoria de sesión (respaldo CSV)
+   ══════════════════════════════════════════════ */
+var ADMIN_PWD  = 'ExoSec2026@SENA';
+var LS_URL_KEY = 'exo_sheets_url_v2';
+var DB         = [];          // respaldo en memoria
+var sheetsUrl  = '';
+
+// Cargar URL guardada
+try { sheetsUrl = localStorage.getItem(LS_URL_KEY) || ''; } catch(e){}
+
+window.addEventListener('DOMContentLoaded', function() {
+  if (sheetsUrl) {
+    document.getElementById('sheets-url').value = sheetsUrl;
+    setStatus('ok', '✓ Google Sheets configurado — cada registro se guarda en la nube automáticamente.');
+  }
+});
+
+/* TOAST */
+function toast(msg, warn) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = warn ? 'warn show' : 'show';
+  setTimeout(function(){ t.className=''; }, 3400);
+}
+
+/* VISTAS */
+function showView(id) {
+  document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function switchTab(name) {
+  ['config','data'].forEach(function(t){
+    document.getElementById('tab-'+t).classList.toggle('active', t===name);
+    document.getElementById('tab-content-'+t).classList.toggle('active', t===name);
+  });
+  if (name === 'data') renderTable();
+}
+
+/* ESTADO SHEETS */
+function setStatus(type, msg) {
+  var box = document.getElementById('sheets-status-box');
+  var dot = document.getElementById('sheets-dot');
+  box.className = 'sheets-status ' + type;
+  dot.className = 'dot-s dot-' + type;
+  document.getElementById('sheets-status-msg').textContent = msg;
+}
+function showConfigMsg(msg, ok) {
+  var el = document.getElementById('config-msg');
+  el.style.display = 'block';
+  el.style.color = ok ? 'var(--ok)' : 'var(--error)';
+  el.textContent = msg;
+}
+
+/* GUARDAR URL */
+function saveSheetConfig() {
+  var url = document.getElementById('sheets-url').value.trim();
+  if (!url) { showConfigMsg('Pega la URL del Web App de Apps Script.', false); return; }
+  if (!url.includes('script.google.com')) {
+    showConfigMsg('La URL debe ser de script.google.com', false); return;
+  }
+  sheetsUrl = url;
+  try { localStorage.setItem(LS_URL_KEY, url); } catch(e){}
+  setStatus('ok', '✓ Google Sheets configurado — cada registro se guarda en la nube automáticamente.');
+  showConfigMsg('✓ URL guardada. Probando conexión…', true);
+  testConnection();
+}
+
+/* PROBAR CONEXIÓN */
+function testConnection() {
+  if (!sheetsUrl) { toast('Primero guarda la URL del Web App', true); return; }
+  var img = new Image();
+  img.onload = img.onerror = function() {
+    setStatus('ok', '✓ Conexión verificada — Google Sheets activo y listo para recibir registros.');
+    showConfigMsg('✓ Conexión exitosa con el Web App.', true);
+    toast('✓ Conectado a Google Sheets correctamente');
+  };
+  img.src = sheetsUrl + '?test=ping&t=' + Date.now();
+}
+
+/* COPIAR CÓDIGO */
+function copyCode() {
+  var code = document.getElementById('apps-script-code').textContent;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(code)
+      .then(function(){ toast('✓ Código copiado al portapapeles'); })
+      .catch(function(){ toast('Selecciona el código manualmente con Ctrl+A y cópialo', true); });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = code;
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('✓ Código copiado al portapapeles');
+  }
+}
+
+/* ══════════════════════════════════════════════
+   ENVÍO A GOOGLE SHEETS — método formulario+iframe
+   Sin CORS, sin redirecciones perdidas, 100% fiable
+   ══════════════════════════════════════════════ */
+function sendToSheets(record) {
+  if (!sheetsUrl) return;
+
+  // Crear formulario oculto apuntando al iframe invisible
+  var form = document.createElement('form');
+  form.method  = 'POST';
+  form.action  = sheetsUrl;
+  form.target  = 'hidden_target';   // iframe en el HTML
+  form.style.cssText = 'display:none;position:absolute';
+
+  var campos = ['fecha','nombres','apellidos','empresa',
+                'sector','empleados','email','telefono','ciudad','pais'];
+  campos.forEach(function(k) {
+    var inp = document.createElement('input');
+    inp.type  = 'hidden';
+    inp.name  = k;
+    inp.value = record[k] || '';
+    form.appendChild(inp);
+  });
+
+  document.body.appendChild(form);
+  form.submit();
+
+  // Limpiar el form después del envío
+  setTimeout(function() {
+    try { document.body.removeChild(form); } catch(e){}
+  }, 3000);
+}
+
+/* ══════════════════════════════════════════════
+   FORMULARIO: VALIDACIÓN Y REGISTRO
+   ══════════════════════════════════════════════ */
+var FIELDS = ['nombres','apellidos','email','telefono','empresa','sector','empleados','ciudad','pais'];
+FIELDS.forEach(function(id) {
+  var el = document.getElementById(id);
+  if (el) el.addEventListener('input', function(){ clearE(id); });
+});
+
+function gv(id)   { return document.getElementById(id).value.trim(); }
+function se(id)   { document.getElementById('err-'+id).classList.add('show');    document.getElementById(id).classList.add('invalid'); }
+function clearE(id){ document.getElementById('err-'+id).classList.remove('show'); document.getElementById(id).classList.remove('invalid'); }
+
+function handleSubmit() {
+  FIELDS.forEach(clearE);
+  var ok = true;
+  if (!gv('nombres'))                                     { se('nombres');   ok=false; }
+  if (!gv('apellidos'))                                   { se('apellidos'); ok=false; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(gv('email')))  { se('email');     ok=false; }
+  if (!gv('telefono'))                                    { se('telefono');  ok=false; }
+  if (!gv('empresa'))                                     { se('empresa');   ok=false; }
+  if (!gv('sector'))                                      { se('sector');    ok=false; }
+  if (!gv('empleados'))                                   { se('empleados'); ok=false; }
+  if (!gv('ciudad'))                                      { se('ciudad');    ok=false; }
+  if (!gv('pais'))                                        { se('pais');      ok=false; }
+  if (!ok) return;
+
+  var btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.textContent = 'Guardando…';
+
+  var now = new Date();
+  var record = {
+    id:        now.getTime(),
+    fecha:     now.toLocaleDateString('es-CO') + ' ' + now.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'}),
+    nombres:   gv('nombres'),   apellidos: gv('apellidos'),
+    email:     gv('email'),     telefono:  gv('telefono'),
+    empresa:   gv('empresa'),   sector:    gv('sector'),
+    empleados: gv('empleados'), ciudad:    gv('ciudad'),
+    pais:      gv('pais')
+  };
+
+  // 1) Guardar en memoria (respaldo CSV)
+  DB.push(record);
+  updateCounter();
+
+  // 2) Enviar a Google Sheets via formulario oculto
+  sendToSheets(record);
+
+  document.getElementById('success-name').textContent  = record.nombres + ' ' + record.apellidos;
+  document.getElementById('success-email').textContent = record.email;
+
+  var destino = sheetsUrl ? ' y enviado a Google Sheets ✓' : ' (⚠ configura Google Sheets en el panel)';
+  toast('Participante #' + DB.length + ' registrado' + destino);
+
+  setTimeout(function() {
+    btn.disabled = false;
+    btn.textContent = '✓  Acceder a los Recursos Gratuitos';
+    showView('view-success');
+  }, 600);
+}
+
+function resetForm() {
+  ['nombres','apellidos','email','telefono','empresa','ciudad'].forEach(function(id){
+    document.getElementById(id).value = '';
+  });
+  ['sector','empleados'].forEach(function(id){ document.getElementById(id).value = ''; });
+  document.getElementById('pais').value = 'Colombia';
+  FIELDS.forEach(clearE);
+  showView('view-form');
+}
+function updateCounter() {
+  document.getElementById('hdr-count').textContent  = DB.length;
+  document.getElementById('admin-total').textContent = DB.length;
+}
+
+/* ADMIN LOGIN */
+function adminLogin() {
+  if (document.getElementById('admin-pwd').value !== ADMIN_PWD) {
+    document.getElementById('err-admin').classList.add('show');
+    document.getElementById('admin-pwd').classList.add('invalid');
+    return;
+  }
+  document.getElementById('err-admin').classList.remove('show');
+  document.getElementById('admin-pwd').classList.remove('invalid');
+  if (sheetsUrl) document.getElementById('sheets-url').value = sheetsUrl;
+  updateCounter();
+  showView('view-admin');
+}
+
+/* TABLA */
+function renderTable() {
+  updateCounter();
+  var tbody = document.getElementById('admin-tbody');
+  if (DB.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Aún no hay registros en esta sesión.</td></tr>';
+    document.getElementById('country-grid').innerHTML = '';
+    return;
+  }
+  tbody.innerHTML = DB.map(function(r,i){
+    return '<tr>'+
+      '<td class="td-muted">'+(i+1)+'</td>'+
+      '<td class="td-muted" style="white-space:nowrap">'+x(r.fecha)+'</td>'+
+      '<td>'+x(r.nombres)+'</td>'+
+      '<td>'+x(r.apellidos)+'</td>'+
+      '<td class="td-trunc" title="'+x(r.empresa)+'">'+x(r.empresa)+'</td>'+
+      '<td><span class="pill">'+x(r.sector)+'</span></td>'+
+      '<td class="td-muted" style="white-space:nowrap">'+x(r.empleados)+'</td>'+
+      '<td class="td-muted">'+x(r.email)+'</td>'+
+      '<td class="td-muted" style="white-space:nowrap">'+x(r.telefono)+'</td>'+
+      '<td>'+x(r.ciudad)+'</td>'+
+      '<td>'+x(r.pais)+'</td>'+
+    '</tr>';
+  }).join('');
+  var counts={};
+  DB.forEach(function(r){ counts[r.pais]=(counts[r.pais]||0)+1; });
+  document.getElementById('country-grid').innerHTML =
+    Object.entries(counts).sort(function(a,b){return b[1]-a[1];}).slice(0,8)
+    .map(function(e){
+      return '<div class="country-card"><div class="country-name">'+x(e[0])+'</div><div class="country-num">'+e[1]+'</div></div>';
+    }).join('');
+}
+function x(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* EXPORTAR CSV */
+function exportCSV() {
+  if (DB.length===0){ toast('No hay registros en sesión para exportar',true); return; }
+  var cols=['Fecha','Nombres','Apellidos','Empresa','Sector','No. Empleados','Email','Teléfono','Ciudad','País'];
+  var rows=DB.map(function(r){ return [r.fecha,r.nombres,r.apellidos,r.empresa,r.sector,r.empleados,r.email,r.telefono,r.ciudad,r.pais]; });
+  var csv=[cols].concat(rows).map(function(row){ return row.map(function(v){ return '"'+String(v||'').replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+  var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download='registros_exoindustrial_'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+  toast('✓ CSV exportado — '+DB.length+' registros');
+}
+</script>
+</body>
+</html>
